@@ -182,7 +182,11 @@ if (dol_is_dir($fastCaptureDir)) {
                 dol_move($fastCaptureDir . '/' . $file['name'], $destdir . '/' . $file['name']);
                 $addedCount++;
                 
-                $fileSizeKo = isset($file['size']) ? round((int)$file['size'] / 1024) : 0;
+                $fileSize = isset($file['size']) ? (int)$file['size'] : 0;
+                if ($fileSize == 0 && file_exists($fastCaptureDir . '/' . $file['name'])) {
+                    $fileSize = (int)filesize($fastCaptureDir . '/' . $file['name']);
+                }
+                $fileSizeKo = round($fileSize / 1024);
                 $fileDetails[] = '<strong>' . $file['name'] . '</strong> (' . $fileSizeKo . 'ko)';
             }
         }
