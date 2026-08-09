@@ -104,7 +104,8 @@ if ($action == 'add_photos') {
                 if (!GETPOST('ajax')) setEventMessages($receipt->error, $receipt->errors, 'errors');
             }
             if (GETPOST('ajax')) {
-                print json_encode(['success' => ($res_update > 0)]);
+                $displayRef = $receipt->ref ? $receipt->ref : '(PROV' . $receipt->rowid . ')';
+                print json_encode(['success' => ($res_update > 0), 'ref' => $displayRef]);
                 exit;
             }
             header("Location: " . $_SERVER['PHP_SELF']);
@@ -537,19 +538,35 @@ $(document).ready(function() {
         $.jnotify("Transfert en cours...", "warning");
         
         var promises = [];
+        var transferredRefs = [];
+        
         formsToSubmit.forEach(function(form) {
             var formData = form.serialize() + "&ajax=1";
-            promises.push($.post(form.attr("action"), formData));
+            var req = $.post(form.attr("action"), formData);
+            req.done(function(response) {
+                try {
+                    var data = JSON.parse(response);
+                    if (data.success && data.ref) {
+                        transferredRefs.push(data.ref);
+                    }
+                } catch(e) {}
+            });
+            promises.push(req);
         });
         
-        $.when.apply($, promises).done(function() {
-            $.jnotify(formsToSubmit.length + " reçu(s) transféré(s) avec succès", "success");
+        $.when.apply($, promises).always(function() {
+            if (transferredRefs.length > 0) {
+                var msg = "Transfert de " + transferredRefs.length + " reçu(s)<br>";
+                transferredRefs.forEach(function(ref) {
+                    msg += ref + " - Transféré<br>";
+                });
+                $.jnotify(msg, "success", true); // pass true for HTML or jnotify might render tags as text, actually jnotify allows HTML by default in dolibarr
+            } else {
+                $.jnotify("Erreur lors du transfert", "error");
+            }
             setTimeout(function() {
                 window.location.reload();
-            }, 1000);
-        }).fail(function() {
-            $.jnotify("Erreur lors du transfert", "error");
-            $(".feed-card textarea[name=\'description\']").trigger("input"); // re-enable valid buttons
+            }, 1500);
         });
     });
 });
