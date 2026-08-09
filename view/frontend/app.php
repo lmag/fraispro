@@ -363,7 +363,7 @@ if ($resql) {
             print '    <div style="display: flex; justify-content: space-between; align-items: center;">';
             $displayRef = (empty($obj->ref) || preg_match('/^\(PROV/i', $obj->ref)) ? 'Reçu #' . $obj->rowid : $obj->ref;
             print '      <div style="color: #1e293b; font-size: 15px;"><strong>' . $displayRef . '</strong><span style="font-weight: normal;">' . $fileTitleInfo . '</span></div>';
-            print '      <span style="color: #64748b; font-size: 12px;">' . dol_print_date($db->jdate($obj->date_creation), 'dayhour') . '</span>';
+            print '      <span style="color: #64748b; font-size: 12px;">' . dol_print_date($db->jdate($obj->date_creation), 'dayhour', 'tzuserrel') . '</span>';
             print '    </div>';
             
             print '    <textarea name="description" placeholder="Description..." class="flat" style="width: 100%; height: 70px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none;"></textarea>';
