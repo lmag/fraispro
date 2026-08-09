@@ -409,7 +409,7 @@ if ($resql) {
             print '      <span style="color: #64748b; font-size: 12px;">' . dol_print_date($db->jdate($obj->date_creation, true), 'dayhour', 'tzuser') . '</span>';
             print '    </div>';
             
-            print '    <textarea name="description" placeholder="Description..." class="flat" style="width: 100%; height: 70px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none;"></textarea>';
+            print '    <textarea name="description" placeholder="Description..." class="flat" style="width: 100%; box-sizing: border-box; height: 70px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none;"></textarea>';
             
             if (isModEnabled('project')) {
                 print '    <div class="fraispro-select-wrapper" style="width: 100%;">';
@@ -472,6 +472,7 @@ print '<style>
 .feed-card .fraispro-select-wrapper .maxwidth100cent, .feed-card .fraispro-select-wrapper select {
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
     padding: 6px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
