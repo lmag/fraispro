@@ -434,7 +434,7 @@ if ($resql) {
             print '      <div style="display: flex; gap: 8px;">';
             // Save Button
             print '        <button type="submit" style="background-color: #9b59b6; color: white; width: 44px; height: 44px; border: none; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;">';
-            print '          <i class="fas fa-save" style="font-size: 20px;"></i>';
+            print '          <i class="fas fa-paper-plane" style="font-size: 20px;"></i>';
             print '        </button>';
             
             // Delete Button
