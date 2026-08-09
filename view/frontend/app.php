@@ -178,8 +178,12 @@ if (dol_is_dir($fastCaptureDir)) {
             $receipt->fk_user_creat = $user->id;
             $receipt->status = 0;
             if ($receipt->create($user) > 0) {
-                // Valider immédiatement pour générer le numéro définitif
-                $receipt->validate($user);
+                // Generate definitive number immediately without validating (keeps status = 0 so it appears in feed)
+                $num = $receipt->getNextNumRef();
+                if (!empty($num)) {
+                    $receipt->ref = $num;
+                    $receipt->update($user);
+                }
                 
                 $destdir = $conf->fraispro->dir_output . '/' . dol_sanitizeFileName($receipt->ref);
                 if (!dol_is_dir($destdir)) dol_mkdir($destdir);
@@ -187,11 +191,11 @@ if (dol_is_dir($fastCaptureDir)) {
                 $addedCount++;
                 
                 $fileSize = isset($file['size']) ? (int)$file['size'] : 0;
-                if ($fileSize == 0 && file_exists($fastCaptureDir . '/' . $file['name'])) {
-                    $fileSize = (int)filesize($fastCaptureDir . '/' . $file['name']);
+                if ($fileSize == 0 && file_exists($destdir . '/' . $file['name'])) {
+                    $fileSize = (int)filesize($destdir . '/' . $file['name']);
                 }
                 $fileSizeKo = round($fileSize / 1024);
-                $fileDetails[] = '<strong>' . $file['name'] . '</strong> (' . $fileSizeKo . 'ko)';
+                $fileDetails[] = 'Recu : ' . $receipt->ref . ' enregistré<br>médias : ' . $file['name'] . ' de (' . $fileSizeKo . ' ko)';
             }
         }
         if ($addedCount > 0) {
@@ -199,7 +203,7 @@ if (dol_is_dir($fastCaptureDir)) {
             if (!empty($fileDetails)) {
                 $msg .= implode('<br>', $fileDetails) . '<br><br>';
             }
-            $msg .= $addedCount . ' nouveau' . ($addedCount > 1 ? 'x' : '') . ' reçu' . ($addedCount > 1 ? 's' : '') . ' enregistré' . ($addedCount > 1 ? 's' : '');
+            $msg .= 'Soit ' . $addedCount . ' recu' . ($addedCount > 1 ? 's' : '');
             setEventMessages($msg, null, 'mesgs');
             // Redirect to clear state and refresh feed
             header("Location: " . $_SERVER['PHP_SELF']);
