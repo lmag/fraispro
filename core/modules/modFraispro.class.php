@@ -104,7 +104,7 @@ class modFraispro extends DolibarrModules
 			// Set this to 1 if module has its own barcode directory (core/modules/barcode)
 			'barcode' => 0,
 			// Set this to 1 if module has its own models directory (core/modules/xxx)
-			'models' => 0,
+			'models' => 1,
 			// Set this to 1 if module has its own printing directory (core/modules/printing)
 			'printing' => 0,
 			// Set this to 1 if module has its own theme directory (theme)
@@ -427,6 +427,22 @@ class modFraispro extends DolibarrModules
 			'target' => '',
 			'user' => 0,
 		);
+		$this->menu[$r++] = array(
+			'fk_menu' => 'fk_mainmenu=fraispro',
+			'type' => 'left',
+			'titre' => 'App',
+			'prefix' => img_picto('', 'mobile', 'class="pictofixedwidth valignmiddle paddingright"'),
+			'mainmenu' => 'fraispro',
+			'leftmenu' => 'fraispro_app',
+			'url' => '/fraispro/view/frontend/app.php',
+			'langs' => 'fraispro@fraispro',
+			'position' => 1000 + $r,
+			'enabled' => 'isModEnabled("fraispro")',
+			'perms' => '1',
+			'target' => '',
+			'user' => 2,
+		);
+
 		/* END MODULEBUILDER LEFTMENU Fraispro */
 
 
