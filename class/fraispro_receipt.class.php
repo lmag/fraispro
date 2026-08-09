@@ -132,12 +132,24 @@ class FraisproReceipt extends CommonObject
 		'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 510, 'notnull' => 1, 'visible' => -2, 'foreignkey' => '0', 'csslist' => 'tdoverflowmax150', 'lang' => 'fraispro@fraispro'),
 		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'picto' => 'user', 'enabled' => 1, 'position' => 511, 'notnull' => -1, 'visible' => -2, 'csslist' => 'tdoverflowmax150', 'lang' => 'fraispro@fraispro'),
 		'status' => array('type' => 'integer', 'label' => 'Status', 'enabled' => 1, 'position' => 2000, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'arrayofkeyval' => array(0 => 'Draft', '1' => 'Validated', 9 => 'Canceled'), 'validate' => 1, 'lang' => 'fraispro@fraispro'),
+		'description' => array('type' => 'text', 'label' => 'Description', 'enabled' => 1, 'position' => 40, 'notnull' => -1, 'visible' => 1, 'lang' => 'fraispro@fraispro'),
+		'fk_project' => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Project', 'enabled' => 1, 'position' => 50, 'notnull' => -1, 'visible' => 1, 'lang' => 'fraispro@fraispro'),
 	);
 
 	/**
 	 * @var int ID
 	 */
 	public $rowid;
+	
+	/**
+	 * @var string Description
+	 */
+	public $description;
+	
+	/**
+	 * @var int fk_project
+	 */
+	public $fk_project;
 
 	/**
 	 * @var string Ref

@@ -95,11 +95,17 @@ if ($action == 'add_photos') {
             $fk_project = GETPOST('fk_project', 'int');
             
             $receipt->status = 1;
+            $receipt->description = $description;
+            $receipt->fk_project = $fk_project;
             $res_update = $receipt->update($user);
             if ($res_update > 0) {
-                setEventMessages('Reçu : ' . $receipt->ref . ' - Transféré dans Traitement', null, 'mesgs');
+                if (!GETPOST('ajax')) setEventMessages('Reçu : ' . $receipt->ref . ' - Transféré dans Traitement', null, 'mesgs');
             } else {
-                setEventMessages($receipt->error, $receipt->errors, 'errors');
+                if (!GETPOST('ajax')) setEventMessages($receipt->error, $receipt->errors, 'errors');
+            }
+            if (GETPOST('ajax')) {
+                print json_encode(['success' => ($res_update > 0)]);
+                exit;
             }
             header("Location: " . $_SERVER['PHP_SELF']);
             exit;
@@ -486,6 +492,68 @@ print '<style>
 .feed-card .saturne-audio-controls { display: inline-flex !important; align-items: center !important; flex-direction: row !important; gap: 6px !important; margin: 0 !important; }
 .feed-card [id$="-audio"] { padding: 0 !important; }
 </style>';
+
+print '<script>
+$(document).ready(function() {
+    // 1. Disable plane button if description is empty
+    $(".feed-card textarea[name=\'description\']").on("input", function() {
+        var form = $(this).closest(".feed-card");
+        var planeBtn = form.find("button[type=\'submit\']");
+        var icon = planeBtn.find("i");
+        if ($(this).val().trim() === "") {
+            planeBtn.css({ "opacity": "0.5", "cursor": "not-allowed" });
+            planeBtn.data("disabled", true);
+        } else {
+            planeBtn.css({ "opacity": "1", "cursor": "pointer" });
+            planeBtn.data("disabled", false);
+        }
+    }).trigger("input");
+
+    // 2. Handle Plane button click for bulk transfer
+    $(".feed-card").on("submit", function(e) {
+        e.preventDefault();
+        
+        var clickedForm = $(this);
+        var clickedBtn = clickedForm.find("button[type=\'submit\']");
+        
+        // If the clicked form has an empty description, do nothing
+        if (clickedBtn.data("disabled")) {
+            return false;
+        }
+        
+        // Find all forms that have a non-empty description
+        var formsToSubmit = [];
+        $(".feed-card").each(function() {
+            var desc = $(this).find("textarea[name=\'description\']").val();
+            if (desc && desc.trim() !== "") {
+                formsToSubmit.push($(this));
+            }
+        });
+        
+        if (formsToSubmit.length === 0) return false;
+        
+        // Disable all buttons to prevent double-click
+        $(".feed-card button[type=\'submit\']").css({ "opacity": "0.5", "cursor": "not-allowed" }).data("disabled", true);
+        $.jnotify("Transfert en cours...", "warning");
+        
+        var promises = [];
+        formsToSubmit.forEach(function(form) {
+            var formData = form.serialize() + "&ajax=1";
+            promises.push($.post(form.attr("action"), formData));
+        });
+        
+        $.when.apply($, promises).done(function() {
+            $.jnotify(formsToSubmit.length + " reçu(s) transféré(s) avec succès", "success");
+            setTimeout(function() {
+                window.location.reload();
+            }, 1000);
+        }).fail(function() {
+            $.jnotify("Erreur lors du transfert", "error");
+            $(".feed-card textarea[name=\'description\']").trigger("input"); // re-enable valid buttons
+        });
+    });
+});
+</script>';
 
 llxFooter();
 $db->close();
