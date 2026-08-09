@@ -61,7 +61,7 @@ $conf->dol_hide_leftmenu = 1;
 llxHeader('', $title, $help_url, '', 0, 0, $moreJS, $moreCSS, '', 'template-pwa fraispro-app');
 
 // Include Homogeneous App Top Header
-$pwaHeaderCenterHtml = '<span style="font-weight:600;">Brouillons</span>';
+$pwaHeaderCenterHtml = '<span style="font-weight:600;">Traitement</span>';
 $fraispro_header = dol_buildpath('/custom/fraispro/view/frontend/fraispro_pwa_header.tpl.php');
 if (file_exists($fraispro_header)) {
     require_once $fraispro_header;
@@ -69,10 +69,10 @@ if (file_exists($fraispro_header)) {
 
 print '<div class="pwa-container" style="padding: 10px; max-width: 1000px; margin: 0 auto;">';
 
-print '<h2 style="margin-bottom: 20px;"><i class="fa fa-list"></i> Reçus en attente</h2>';
+print '<h2 style="margin-bottom: 20px;"><i class="fa fa-list"></i> Traitement des reçus</h2>';
 
 // TODO: Query the llx_fraispro_receipt table to list the drafts for the current user
-$sql = "SELECT rowid, ref, date_creation, status FROM " . MAIN_DB_PREFIX . "fraispro_receipt WHERE fk_user_creat = " . ((int)$user->id) . " AND status = 1 AND (fk_expensereport IS NULL OR fk_expensereport = 0) ORDER BY date_creation DESC";
+$sql = "SELECT rowid, ref, date_creation, status, description, fk_project FROM " . MAIN_DB_PREFIX . "fraispro_receipt WHERE fk_user_creat = " . ((int)$user->id) . " AND status = 1 AND (fk_expensereport IS NULL OR fk_expensereport = 0) ORDER BY date_creation DESC";
 $resql = $db->query($sql);
 
 if ($resql) {
@@ -108,8 +108,12 @@ if ($resql) {
                 print '    </div>';
             }
             
+            $displayRef = empty($obj->ref) ? '(PROV' . $obj->rowid . ')' : $obj->ref;
             print '    <div class="draft-info">';
-            print '      <strong style="color: #1e293b; display: block; font-size: 15px;">Reçu #' . $obj->rowid . '</strong>';
+            print '      <strong style="color: #1e293b; display: block; font-size: 15px;">' . $displayRef . '</strong>';
+            if (!empty($obj->description)) {
+                print '      <span style="color: #334155; display: block; font-size: 13px; margin: 2px 0;">' . dol_htmlentities($obj->description) . '</span>';
+            }
             print '      <span style="color: #64748b; font-size: 12px;">' . dol_print_date($db->jdate($obj->date_creation), 'dayhour') . '</span>';
             print '    </div>';
             print '  </div>'; // end draft-left
