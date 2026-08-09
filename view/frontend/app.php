@@ -413,7 +413,7 @@ if ($resql) {
             
             if (isModEnabled('project')) {
                 print '    <div class="fraispro-select-wrapper" style="width: 100%;">';
-                print $formProject->select_projects(-1, -1, 'fk_project', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'maxwidth100cent');
+                print $formProject->select_projects(-1, -1, 'fk_project', 0, 0, 1, -1, 0, 0, 0, '', 1, 0, 'maxwidth100cent', 'fk_project_' . $obj->rowid);
                 print '    </div>';
             }
             
