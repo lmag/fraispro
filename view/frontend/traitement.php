@@ -138,7 +138,9 @@ if ($resql) {
             }
             
             print '<div class="draft-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between;">';
-            print '  <div class="draft-left saturne-media-gallery" style="display: flex; align-items: center; gap: 15px;">';
+            // Left: Image
+            $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
+            print '  <div class="draft-left saturne-media-gallery saturne-media-upload-block" data-module="fraispro" data-subdir="' . $sanitizedRef . '" style="display: flex; align-items: center; gap: 15px;">';
             
             // Thumbnail
             if ($thumbUrl) {
