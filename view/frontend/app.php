@@ -350,7 +350,7 @@ print '<style>
 </style>';
 
 // --- BOTTOM SECTION: DRAFTS FEED ---
-$sql = "SELECT rowid, ref, date_creation FROM " . MAIN_DB_PREFIX . "fraispro_receipt WHERE fk_user_creat = " . ((int)$user->id) . " AND status = 0 ORDER BY date_creation DESC";
+$sql = "SELECT rowid, ref, date_creation FROM " . MAIN_DB_PREFIX . "fraispro_receipt WHERE fk_user_creat = " . ((int)$user->id) . " AND status = 0 ORDER BY ref DESC, date_creation DESC";
 $resql = $db->query($sql);
 
 if ($resql) {

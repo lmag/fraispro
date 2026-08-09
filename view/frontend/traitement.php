@@ -72,7 +72,7 @@ print '<div class="pwa-container" style="padding: 10px; max-width: 1000px; margi
 print '<h2 style="margin-bottom: 20px;"><i class="fa fa-list"></i> Traitement des reçus</h2>';
 
 // TODO: Query the llx_fraispro_receipt table to list the drafts for the current user
-$sql = "SELECT rowid, ref, date_creation, status, description, fk_project FROM " . MAIN_DB_PREFIX . "fraispro_receipt WHERE fk_user_creat = " . ((int)$user->id) . " AND status = 1 AND (fk_expensereport IS NULL OR fk_expensereport = 0) ORDER BY date_creation DESC";
+$sql = "SELECT rowid, ref, date_creation, status, description, fk_project FROM " . MAIN_DB_PREFIX . "fraispro_receipt WHERE fk_user_creat = " . ((int)$user->id) . " AND status = 1 AND (fk_expensereport IS NULL OR fk_expensereport = 0) ORDER BY ref DESC, date_creation DESC";
 $resql = $db->query($sql);
 
 if ($resql) {
