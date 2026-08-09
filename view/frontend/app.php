@@ -361,7 +361,7 @@ if ($resql) {
             print '  <div class="feed-content" style="flex: 1; display: flex; flex-direction: column; gap: 10px;">';
             
             print '    <div style="display: flex; justify-content: space-between; align-items: center;">';
-            $displayRef = (empty($obj->ref) || preg_match('/^\(PROV/i', $obj->ref)) ? 'Reçu #' . $obj->rowid : $obj->ref;
+            $displayRef = empty($obj->ref) ? '(PROV' . $obj->rowid . ')' : $obj->ref;
             print '      <div style="color: #1e293b; font-size: 15px;"><strong>' . $displayRef . '</strong><span style="font-weight: normal;">' . $fileTitleInfo . '</span></div>';
             print '      <span style="color: #64748b; font-size: 12px;">' . dol_print_date($db->jdate($obj->date_creation, true), 'dayhour', 'tzuser') . '</span>';
             print '    </div>';
