@@ -74,7 +74,8 @@ if ($action == 'uploadPhoto' || $action == 'upload_media') {
         // Return HTML for refreshGallery
         $ref = $subDir;
         $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
-        $thumbUrl = DOL_URL_ROOT . '/document.php?modulepart=fraispro&entity=' . $conf->entity . '&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $_FILES['userfile']['name']);
+        $filename = is_array($_FILES['userfile']['name']) ? $_FILES['userfile']['name'][0] : $_FILES['userfile']['name'];
+        $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=fraispro&entity=' . $conf->entity . '&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $filename);
         $urlsJson = json_encode([$thumbUrl]);
         
         $html = '<div id="gallery-' . $sanitizedRef . '" class="draft-left linked-medias" style="display: flex; align-items: center; gap: 15px;">';
