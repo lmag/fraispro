@@ -404,7 +404,7 @@ if ($resql) {
                     foreach ($imageFiles as $f) {
                         $urls[] = DOL_URL_ROOT . '/document.php?modulepart=fraispro&entity=1&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $f['name']);
                     }
-                    $urlsJson = htmlspecialchars(json_encode($urls), ENT_QUOTES, 'UTF-8');
+                    $urlsJson = json_encode($urls);
                 } elseif (!empty($allFiles)) {
                     $titleFileObj = $allFiles[0];
                 }
