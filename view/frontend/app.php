@@ -401,12 +401,12 @@ if ($resql) {
             print '  </div>';
             
             // Right: Content
-            print '  <div class="feed-content" style="flex: 1; display: flex; flex-direction: column; gap: 10px;">';
+            print '  <div class="feed-content" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;">';
             
-            print '    <div style="display: flex; justify-content: space-between; align-items: center;">';
+            print '    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">';
             $displayRef = empty($obj->ref) ? '(PROV' . $obj->rowid . ')' : $obj->ref;
-            print '      <div style="color: #1e293b; font-size: 15px;"><strong>' . $displayRef . '</strong><span style="font-weight: normal;">' . $fileTitleInfo . '</span></div>';
-            print '      <span style="color: #64748b; font-size: 12px;">' . dol_print_date($db->jdate($obj->date_creation, true), 'dayhour', 'tzuser') . '</span>';
+            print '      <div style="color: #1e293b; font-size: 15px; flex: 1; min-width: 0; word-break: break-word;"><strong>' . $displayRef . '</strong><span style="font-weight: normal;">' . $fileTitleInfo . '</span></div>';
+            print '      <span style="color: #64748b; font-size: 12px; white-space: nowrap; flex-shrink: 0; padding-top: 2px;">' . dol_print_date($db->jdate($obj->date_creation, true), 'dayhour', 'tzuser') . '</span>';
             print '    </div>';
             
             print '    <textarea name="description" placeholder="Description..." class="flat" style="width: 100%; box-sizing: border-box; height: 70px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none;"></textarea>';
