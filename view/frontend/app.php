@@ -97,7 +97,7 @@ if ($action == 'add_photos') {
             $receipt->status = 1;
             $res_update = $receipt->update($user);
             if ($res_update > 0) {
-                setEventMessages('Reçu validé', null, 'mesgs');
+                setEventMessages('Reçu : ' . $receipt->ref . ' - Transféré dans Traitement', null, 'mesgs');
             } else {
                 setEventMessages($receipt->error, $receipt->errors, 'errors');
             }
