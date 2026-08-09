@@ -71,7 +71,20 @@ if ($action == 'uploadPhoto' || $action == 'upload_media') {
     }
     
     if ($res > 0) {
-        print json_encode(['success' => true]);
+        // Return HTML for refreshGallery
+        $ref = $subDir;
+        $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
+        $thumbUrl = DOL_URL_ROOT . '/document.php?modulepart=fraispro&entity=' . $conf->entity . '&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $_FILES['userfile']['name']);
+        $urlsJson = json_encode([$thumbUrl]);
+        
+        $html = '<div id="gallery-' . $sanitizedRef . '" class="draft-left linked-medias" style="display: flex; align-items: center; gap: 15px;">';
+        $html .= '  <div class="fast-upload-options" data-from-type="fraispro" data-from-subdir="' . $sanitizedRef . '"></div>';
+        $html .= '  <div class="saturne-media-gallery">';
+        $html .= '    <img src="' . $thumbUrl . '&v=' . time() . '" class="open-media-editor-as-gallery" data-json="' . htmlspecialchars($urlsJson, ENT_QUOTES, 'UTF-8') . '" style="cursor: pointer; width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" alt="Reçu">';
+        $html .= '  </div>';
+        $html .= '</div>';
+        
+        print $html;
     } else {
         print json_encode(['success' => false, 'error' => 'Upload failed']);
     }
@@ -133,24 +146,26 @@ if ($resql) {
                         $urls[] = DOL_URL_ROOT . '/document.php?modulepart=fraispro&entity=1&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $file['name']);
                     }
                     $thumbUrl = $urls[0];
-                    $urlsJson = htmlspecialchars(json_encode($urls), ENT_QUOTES, 'UTF-8');
+                    $urlsJson = json_encode($urls);
                 }
             }
             
             print '<div class="draft-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between;">';
             // Left: Image
             $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
-            print '  <div class="draft-left saturne-media-gallery linked-medias" style="display: flex; align-items: center; gap: 15px;">';
+            print '  <div id="gallery-' . $sanitizedRef . '" class="draft-left linked-medias" style="display: flex; align-items: center; gap: 15px;">';
             print '    <div class="fast-upload-options" data-from-type="fraispro" data-from-subdir="' . $sanitizedRef . '"></div>';
+            print '    <div class="saturne-media-gallery">';
             
             // Thumbnail
             if ($thumbUrl) {
-                print '    <img src="' . $thumbUrl . '" class="open-media-editor-as-gallery" data-json="' . $urlsJson . '" style="cursor: pointer; width: 80px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
+                print '      <img src="' . $thumbUrl . '&v=' . time() . '" class="open-media-editor-as-gallery" data-json="' . htmlspecialchars($urlsJson, ENT_QUOTES, 'UTF-8') . '" style="cursor: pointer; width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" alt="Reçu">';
             } else {
-                print '    <div style="width: 80px; height: 80px; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">';
-                print '      <i class="fa fa-file-invoice" style="font-size: 24px; color: #94a3b8;"></i>';
-                print '    </div>';
+                print '      <div style="width: 60px; height: 60px; background: #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">';
+                print '        <i class="fas fa-image"></i>';
+                print '      </div>';
             }
+            print '    </div>';
             
             $displayRef = empty($obj->ref) ? '(PROV' . $obj->rowid . ')' : $obj->ref;
             print '    <div class="draft-info">';

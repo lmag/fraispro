@@ -210,7 +210,20 @@ if ($action == 'add_photos') {
     file_put_contents($logFile, "Result dol_add_file_process: " . $res . "\n", FILE_APPEND);
     
     if ($res > 0) {
-        print json_encode(['success' => true]);
+        // Return HTML for refreshGallery
+        $ref = $subDir;
+        $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
+        $thumbUrl = DOL_URL_ROOT . '/document.php?modulepart=fraispro&entity=' . $conf->entity . '&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $_FILES['userfile']['name']);
+        $urlsJson = json_encode([$thumbUrl]);
+        
+        $html = '<div id="gallery-' . $sanitizedRef . '" class="feed-image linked-medias" style="width: 120px; flex-shrink: 0;">';
+        $html .= '  <div class="fast-upload-options" data-from-type="fraispro" data-from-subdir="' . $sanitizedRef . '"></div>';
+        $html .= '  <div class="saturne-media-gallery" style="width: 100%; height: 100%;">';
+        $html .= '    <img src="' . $thumbUrl . '&v=' . time() . '" class="open-media-editor-as-gallery" data-json="' . htmlspecialchars($urlsJson, ENT_QUOTES, 'UTF-8') . '" style="cursor: pointer; width: 100%; height: 160px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
+        $html .= '  </div>';
+        $html .= '</div>';
+        
+        print $html;
     } else {
         print json_encode(['success' => false, 'error' => 'Upload failed']);
     }
@@ -414,15 +427,18 @@ if ($resql) {
             
             // Left: Image
             $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
-            print '  <div class="feed-image saturne-media-gallery linked-medias" style="width: 120px; flex-shrink: 0;">';
+            print '  <div id="gallery-' . $sanitizedRef . '" class="feed-image linked-medias" style="width: 120px; flex-shrink: 0;">';
             print '    <div class="fast-upload-options" data-from-type="fraispro" data-from-subdir="' . $sanitizedRef . '"></div>';
+            print '    <div class="saturne-media-gallery" style="width: 100%; height: 100%;">';
+            
             if ($thumbUrl) {
-                print '    <img src="' . $thumbUrl . '" class="open-media-editor-as-gallery" data-json="' . $urlsJson . '" style="cursor: pointer; width: 100%; height: 160px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
+                print '      <img src="' . $thumbUrl . '&v=' . time() . '" class="open-media-editor-as-gallery" data-json="' . htmlspecialchars($urlsJson, ENT_QUOTES, 'UTF-8') . '" style="cursor: pointer; width: 100%; height: 160px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
             } else {
-                print '    <div style="width: 100%; height: 160px; background: #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center;">';
-                print '      <i class="fa fa-file-invoice" style="font-size: 30px; color: #94a3b8;"></i>';
-                print '    </div>';
+                print '      <div style="width: 100%; height: 160px; background: #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">';
+                print '        <i class="fas fa-image fa-2x"></i>';
+                print '      </div>';
             }
+            print '    </div>';
             print '  </div>';
             
             // Right: Content
