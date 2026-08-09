@@ -72,6 +72,7 @@ if ($action == 'add_photos') {
                 $receipt->status = 0;
                 $res_create = $receipt->create($user);
                 if ($res_create > 0) {
+                    $receipt->validate($user);
                     $destdir = $conf->fraispro->dir_output . '/' . dol_sanitizeFileName($receipt->ref);
                     if (!dol_is_dir($destdir)) {
                         dol_mkdir($destdir);
@@ -177,6 +178,9 @@ if (dol_is_dir($fastCaptureDir)) {
             $receipt->fk_user_creat = $user->id;
             $receipt->status = 0;
             if ($receipt->create($user) > 0) {
+                // Valider immédiatement pour générer le numéro définitif
+                $receipt->validate($user);
+                
                 $destdir = $conf->fraispro->dir_output . '/' . dol_sanitizeFileName($receipt->ref);
                 if (!dol_is_dir($destdir)) dol_mkdir($destdir);
                 dol_move($fastCaptureDir . '/' . $file['name'], $destdir . '/' . $file['name']);
@@ -357,7 +361,8 @@ if ($resql) {
             print '  <div class="feed-content" style="flex: 1; display: flex; flex-direction: column; gap: 10px;">';
             
             print '    <div style="display: flex; justify-content: space-between; align-items: center;">';
-            print '      <strong style="color: #1e293b; font-size: 15px;">Reçu #' . $obj->rowid . $fileTitleInfo . '</strong>';
+            $displayRef = (empty($obj->ref) || preg_match('/^\(PROV/i', $obj->ref)) ? 'Reçu #' . $obj->rowid : $obj->ref;
+            print '      <div style="color: #1e293b; font-size: 15px;"><strong>' . $displayRef . '</strong><span style="font-weight: normal;">' . $fileTitleInfo . '</span></div>';
             print '      <span style="color: #64748b; font-size: 12px;">' . dol_print_date($db->jdate($obj->date_creation), 'dayhour') . '</span>';
             print '    </div>';
             
