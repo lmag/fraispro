@@ -86,13 +86,17 @@ if ($resql) {
             $ref = $obj->ref ? $obj->ref : (string)$obj->rowid; // Fallback to rowid if ref is empty
             $dir = $conf->fraispro->dir_output . '/' . dol_sanitizeFileName($ref);
             $thumbUrl = '';
+            $urlsJson = '[]';
             
             if (dol_is_dir($dir)) {
                 $files = dol_dir_list($dir, 'files', 0, '\.(png|jpg|jpeg|gif|webp)$', '', 'date', SORT_DESC);
                 if (!empty($files)) {
-                    $firstFile = $files[0]['name'];
-                    // Use document.php to serve the image safely
-                    $thumbUrl = DOL_URL_ROOT . '/document.php?modulepart=fraispro&entity=1&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $firstFile);
+                    $urls = [];
+                    foreach ($files as $file) {
+                        $urls[] = DOL_URL_ROOT . '/document.php?modulepart=fraispro&entity=1&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $file['name']);
+                    }
+                    $thumbUrl = $urls[0];
+                    $urlsJson = htmlspecialchars(json_encode($urls), ENT_QUOTES, 'UTF-8');
                 }
             }
             
@@ -101,7 +105,7 @@ if ($resql) {
             
             // Thumbnail
             if ($thumbUrl) {
-                print '    <img src="' . $thumbUrl . '" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
+                print '    <img src="' . $thumbUrl . '" class="open-media-editor-as-gallery" data-json="' . $urlsJson . '" style="cursor: pointer; width: 80px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
             } else {
                 print '    <div style="width: 80px; height: 80px; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">';
                 print '      <i class="fa fa-file-invoice" style="font-size: 24px; color: #94a3b8;"></i>';
