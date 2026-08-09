@@ -414,7 +414,8 @@ if ($resql) {
             
             // Left: Image
             $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
-            print '  <div class="feed-image saturne-media-gallery saturne-media-upload-block" data-module="fraispro" data-subdir="' . $sanitizedRef . '" style="width: 120px; flex-shrink: 0;">';
+            print '  <div class="feed-image saturne-media-gallery linked-medias" style="width: 120px; flex-shrink: 0;">';
+            print '    <div class="fast-upload-options" data-from-type="fraispro" data-from-subdir="' . $sanitizedRef . '"></div>';
             if ($thumbUrl) {
                 print '    <img src="' . $thumbUrl . '" class="open-media-editor-as-gallery" data-json="' . $urlsJson . '" style="cursor: pointer; width: 100%; height: 160px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
             } else {
