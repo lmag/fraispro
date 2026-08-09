@@ -408,7 +408,7 @@ if ($resql) {
             print '  <input type="hidden" name="rowid" value="' . $obj->rowid . '">';
             
             // Left: Image
-            print '  <div class="feed-image" style="width: 120px; flex-shrink: 0;">';
+            print '  <div class="feed-image saturne-media-gallery" style="width: 120px; flex-shrink: 0;">';
             if ($thumbUrl) {
                 print '    <img src="' . $thumbUrl . '" class="open-media-editor-as-gallery" data-json="' . $urlsJson . '" style="cursor: pointer; width: 100%; height: 160px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
             } else {
