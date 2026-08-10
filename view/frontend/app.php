@@ -360,15 +360,22 @@ $(document).ready(function() {
     });
     
     // Check periodically if the editor modal is open or closed
+    var editorClosedTime = 0;
     setInterval(function() {
         var isEditorOpen = $(".wpeo-modal, .saturne-editor-modal, [class*=\'media-editor\']").filter(":visible").length > 0;
         
         if (isEditorOpen) {
             window.editorWasOpen = true;
+            editorClosedTime = 0;
         } else if (window.editorWasOpen && window.hasUploadedFastCapture) {
-            // Editor was open, but is now closed, and we have pending fast captures!
-            window.hasUploadedFastCapture = false; // prevent loop
-            window.location.reload();
+            // Editor is closed, but maybe just temporarily between two photos in a sequential upload.
+            // Wait at least 2.5 seconds and ensure no AJAX requests are active.
+            if (editorClosedTime === 0) {
+                editorClosedTime = Date.now();
+            } else if (Date.now() - editorClosedTime > 2500 && $.active === 0) {
+                window.hasUploadedFastCapture = false; // prevent loop
+                window.location.reload();
+            }
         }
     }, 500);
 });
