@@ -210,12 +210,8 @@ if ($action == 'add_photos') {
     file_put_contents($logFile, "Result dol_add_file_process: " . $res . "\n", FILE_APPEND);
     if ($res > 0) {
         if (strpos($subDir, 'tmp/fast_capture') === 0) {
-            // Fast capture upload: return the fast capture block HTML again 
-            // so Saturne's refreshGallery doesn't destroy the DOM element and break the editor.
-            require_once DOL_DOCUMENT_ROOT . '/custom/saturne/lib/medias.lib.php';
-            print '<div id="saturne-fast-capture" style="display:flex; gap:10px;">';
-            print saturne_render_media_block('fraispro', 'tmp/fast_capture_' . $user->id, 'fast_', '', ['show_photo' => true, 'show_audio' => false, 'show_gallery' => false]);
-            print '</div>';
+            // Fast capture upload: return JSON. Our JS protects the DOM from being destroyed.
+            print json_encode(['success' => true, 'fast_capture' => true]);
         } else {
             // Regular image edit: Return HTML for refreshGallery
             $ref = $subDir;
@@ -341,11 +337,24 @@ $(document).ready(function() {
     window.hasUploadedFastCapture = false;
     window.editorWasOpen = false;
 
+    // Protect the Fast Capture DOM from being destroyed by Saturne\'s refreshGallery
+    // If the DOM is destroyed, the <input type="file"> is lost and arrows disappear!
+    $(document).ajaxSend(function(event, jqxhr, settings) {
+        if (settings.url && settings.url.indexOf("action=uploadPhoto") !== -1 && settings.url.indexOf("tmp/fast_capture") !== -1) {
+            // Temporarily rename the class so e.find(".saturne-media-gallery") fails
+            $("#saturne-fast-capture .saturne-media-gallery").removeClass("saturne-media-gallery").addClass("saturne-media-gallery-protected");
+        }
+    });
+
     // Detect fast capture uploads
     $(document).ajaxComplete(function(event, xhr, settings) {
         if (settings.url && settings.url.indexOf("action=uploadPhoto") !== -1) {
-            if (xhr.responseText && xhr.responseText.indexOf("saturne-fast-capture") !== -1) {
+            if (settings.url.indexOf("tmp/fast_capture") !== -1) {
                 window.hasUploadedFastCapture = true;
+                // Restore the class after refreshGallery has run
+                setTimeout(function() {
+                    $(".saturne-media-gallery-protected").removeClass("saturne-media-gallery-protected").addClass("saturne-media-gallery");
+                }, 100);
             }
         }
     });
