@@ -158,7 +158,7 @@ if ($action == 'add_photos') {
         if ($receipt->fetch($rowid) > 0) {
             $res_delete = $receipt->delete($user);
             if ($res_delete > 0) {
-                setEventMessages('Reçu supprimé avec succès', null, 'mesgs');
+                setEventMessages($receipt->ref . ' - Supprimé', null, 'mesgs');
             } else {
                 setEventMessages($receipt->error, $receipt->errors, 'errors');
             }
@@ -490,7 +490,7 @@ if ($resql) {
             print '        </button>';
             
             // Delete Button
-            print '        <a href="' . $_SERVER['PHP_SELF'] . '?action=delete_receipt&rowid=' . $obj->rowid . '&token=' . newToken() . '" onclick="return confirm(\'Êtes-vous sûr de vouloir supprimer ce reçu ?\');" style="background-color: #ef4444; color: white; width: 44px; height: 44px; border: none; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0; text-decoration: none;">';
+            print '        <a href="' . $_SERVER['PHP_SELF'] . '?action=delete_receipt&rowid=' . $obj->rowid . '&token=' . newToken() . '" style="background-color: #ef4444; color: white; width: 44px; height: 44px; border: none; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0; text-decoration: none;">';
             print '          <i class="fas fa-trash-alt" style="font-size: 18px;"></i>';
             print '        </a>';
             print '      </div>';
