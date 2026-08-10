@@ -338,10 +338,30 @@ print '</div>';
 // JS for Saturne
 print '<script>
 $(document).ready(function() {
-    // We removed the auto-reload here because it interrupts multi-file uploads in the Saturne editor.
-    // Saturne needs to process all files before we can reload.
-    // For now, the user might need to manually refresh or we can add a refresh button if needed.
-    // Or we rely on the user to refresh the page.
+    window.hasUploadedFastCapture = false;
+    window.editorWasOpen = false;
+
+    // Detect fast capture uploads
+    $(document).ajaxComplete(function(event, xhr, settings) {
+        if (settings.url && settings.url.indexOf("action=uploadPhoto") !== -1) {
+            if (xhr.responseText && xhr.responseText.indexOf("saturne-fast-capture") !== -1) {
+                window.hasUploadedFastCapture = true;
+            }
+        }
+    });
+    
+    // Check periodically if the editor modal is open or closed
+    setInterval(function() {
+        var isEditorOpen = $(".wpeo-modal, .saturne-editor-modal, [class*=\'media-editor\']").filter(":visible").length > 0;
+        
+        if (isEditorOpen) {
+            window.editorWasOpen = true;
+        } else if (window.editorWasOpen && window.hasUploadedFastCapture) {
+            // Editor was open, but is now closed, and we have pending fast captures!
+            window.hasUploadedFastCapture = false; // prevent loop
+            window.location.reload();
+        }
+    }, 500);
 });
 </script>';
 print '<style>
