@@ -337,10 +337,10 @@ $(document).ready(function() {
     window.hasUploadedFastCapture = false;
     window.editorWasOpen = false;
 
-    // Protect the Fast Capture DOM from being destroyed by Saturne\'s refreshGallery
+    // Protect the Fast Capture DOM from being destroyed by Saturne's refreshGallery
     // If the DOM is destroyed, the <input type="file"> is lost and arrows disappear!
     $(document).ajaxSend(function(event, jqxhr, settings) {
-        if (settings.url && settings.url.indexOf("action=uploadPhoto") !== -1 && settings.url.indexOf("tmp/fast_capture") !== -1) {
+        if (settings.url && settings.url.indexOf("action=uploadPhoto") !== -1) {
             // Temporarily rename the class so e.find(".saturne-media-gallery") fails
             $("#saturne-fast-capture .saturne-media-gallery").removeClass("saturne-media-gallery").addClass("saturne-media-gallery-protected");
         }
@@ -349,13 +349,11 @@ $(document).ready(function() {
     // Detect fast capture uploads
     $(document).ajaxComplete(function(event, xhr, settings) {
         if (settings.url && settings.url.indexOf("action=uploadPhoto") !== -1) {
-            if (settings.url.indexOf("tmp/fast_capture") !== -1) {
-                window.hasUploadedFastCapture = true;
-                // Restore the class after refreshGallery has run
-                setTimeout(function() {
-                    $(".saturne-media-gallery-protected").removeClass("saturne-media-gallery-protected").addClass("saturne-media-gallery");
-                }, 100);
-            }
+            window.hasUploadedFastCapture = true;
+            // Restore the class after refreshGallery has run
+            setTimeout(function() {
+                $(".saturne-media-gallery-protected").removeClass("saturne-media-gallery-protected").addClass("saturne-media-gallery");
+            }, 100);
         }
     });
     
