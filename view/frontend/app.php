@@ -210,8 +210,12 @@ if ($action == 'add_photos') {
     file_put_contents($logFile, "Result dol_add_file_process: " . $res . "\n", FILE_APPEND);
     if ($res > 0) {
         if (strpos($subDir, 'tmp/fast_capture') === 0) {
-            // Fast capture upload: return JSON so AJAX complete handler can trigger reload
-            print json_encode(['success' => true, 'fast_capture' => true]);
+            // Fast capture upload: return the fast capture block HTML again 
+            // so Saturne's refreshGallery doesn't destroy the DOM element and break the editor.
+            require_once DOL_DOCUMENT_ROOT . '/custom/saturne/lib/medias.lib.php';
+            print '<div id="saturne-fast-capture" style="display:flex; gap:10px;">';
+            print saturne_render_media_block('fraispro', 'tmp/fast_capture_' . $user->id, 'fast_', '', ['show_photo' => true, 'show_audio' => false, 'show_gallery' => false]);
+            print '</div>';
         } else {
             // Regular image edit: Return HTML for refreshGallery
             $ref = $subDir;
