@@ -331,23 +331,13 @@ print '</div>';
 print '<div style="font-weight: 600; font-size: 16px; color: #1e293b;">Envoyez vos reçus !</div>';
 print '</div>';
 
-// JS to auto-reload when Saturne finishes uploading ONLY for fast capture
+// JS for Saturne
 print '<script>
 $(document).ready(function() {
-    $(document).ajaxComplete(function(event, xhr, settings) {
-        if (settings.url && (settings.url.indexOf("action=upload_media") !== -1 || settings.url.indexOf("action=uploadPhoto") !== -1)) {
-            try {
-                var res = JSON.parse(xhr.responseText);
-                if (res && res.fast_capture) {
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 500);
-                }
-            } catch(e) {
-                // Not JSON, probably HTML for image edit refresh, ignore.
-            }
-        }
-    });
+    // We removed the auto-reload here because it interrupts multi-file uploads in the Saturne editor.
+    // Saturne needs to process all files before we can reload.
+    // For now, the user might need to manually refresh or we can add a refresh button if needed.
+    // Or we rely on the user to refresh the page.
 });
 </script>';
 print '<style>
