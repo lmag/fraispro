@@ -337,7 +337,7 @@ $(document).ready(function() {
     window.hasUploadedFastCapture = false;
     window.editorWasOpen = false;
 
-    // Protect the Fast Capture DOM from being destroyed by Saturne's refreshGallery
+    // Protect the Fast Capture DOM from being destroyed by Saturne\'s refreshGallery
     // If the DOM is destroyed, the <input type="file"> is lost and arrows disappear!
     $(document).ajaxSend(function(event, jqxhr, settings) {
         if (settings.url && settings.url.indexOf("action=uploadPhoto") !== -1) {
