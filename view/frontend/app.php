@@ -217,8 +217,23 @@ if ($action == 'add_photos') {
             $ref = $subDir;
             $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
             $filename = is_array($_FILES['userfile']['name']) ? $_FILES['userfile']['name'][0] : $_FILES['userfile']['name'];
-            $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=fraispro&entity=' . $conf->entity . '&file=' . urlencode($ref . '/' . $filename); // Don't sanitize ref in URL if it contains slashes, but ref here doesn't.
-            $urlsJson = json_encode([$thumbUrl]);
+            $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=fraispro&entity=' . $conf->entity . '&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $filename); 
+            
+            // Get ALL images in directory to preserve gallery navigation
+            $urls = [];
+            $dir = $conf->fraispro->dir_output . '/' . dol_sanitizeFileName($ref);
+            if (dol_is_dir($dir)) {
+                $imageFiles = dol_dir_list($dir, 'files', 0, '\.(png|jpg|jpeg|gif|webp)$', '', 'date', SORT_DESC);
+                if (!empty($imageFiles)) {
+                    foreach ($imageFiles as $f) {
+                        $urls[] = DOL_URL_ROOT . '/document.php?modulepart=fraispro&entity=1&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $f['name']);
+                    }
+                }
+            }
+            if (empty($urls)) {
+                $urls[] = $thumbUrl;
+            }
+            $urlsJson = json_encode($urls);
             
             $html = '<div id="gallery-' . $sanitizedRef . '" class="feed-image linked-medias" style="width: 120px; flex-shrink: 0;">';
             $html .= '  <div class="fast-upload-options" data-from-type="fraispro" data-from-subdir="' . $sanitizedRef . '"></div>';
