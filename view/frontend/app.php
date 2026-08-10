@@ -209,21 +209,26 @@ if ($action == 'add_photos') {
     
     file_put_contents($logFile, "Result dol_add_file_process: " . $res . "\n", FILE_APPEND);
     if ($res > 0) {
-        // Return HTML for refreshGallery
-        $ref = $subDir;
-        $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
-        $filename = is_array($_FILES['userfile']['name']) ? $_FILES['userfile']['name'][0] : $_FILES['userfile']['name'];
-        $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=fraispro&entity=' . $conf->entity . '&file=' . urlencode(dol_sanitizeFileName($ref) . '/' . $filename);
-        $urlsJson = json_encode([$thumbUrl]);
-        
-        $html = '<div id="gallery-' . $sanitizedRef . '" class="feed-image linked-medias" style="width: 120px; flex-shrink: 0;">';
-        $html .= '  <div class="fast-upload-options" data-from-type="fraispro" data-from-subdir="' . $sanitizedRef . '"></div>';
-        $html .= '  <div class="saturne-media-gallery" style="width: 100%; height: 100%;">';
-        $html .= '    <img src="' . $thumbUrl . '&v=' . time() . '" class="open-media-editor-as-gallery" data-json="' . htmlspecialchars($urlsJson, ENT_QUOTES, 'UTF-8') . '" style="cursor: pointer; width: 100%; height: 160px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
-        $html .= '  </div>';
-        $html .= '</div>';
-        
-        print $html;
+        if (strpos($subDir, 'tmp/fast_capture') === 0) {
+            // Fast capture upload: return JSON so AJAX complete handler can trigger reload
+            print json_encode(['success' => true, 'fast_capture' => true]);
+        } else {
+            // Regular image edit: Return HTML for refreshGallery
+            $ref = $subDir;
+            $sanitizedRef = dol_escape_htmltag(dol_sanitizeFileName($ref));
+            $filename = is_array($_FILES['userfile']['name']) ? $_FILES['userfile']['name'][0] : $_FILES['userfile']['name'];
+            $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=fraispro&entity=' . $conf->entity . '&file=' . urlencode($ref . '/' . $filename); // Don't sanitize ref in URL if it contains slashes, but ref here doesn't.
+            $urlsJson = json_encode([$thumbUrl]);
+            
+            $html = '<div id="gallery-' . $sanitizedRef . '" class="feed-image linked-medias" style="width: 120px; flex-shrink: 0;">';
+            $html .= '  <div class="fast-upload-options" data-from-type="fraispro" data-from-subdir="' . $sanitizedRef . '"></div>';
+            $html .= '  <div class="saturne-media-gallery" style="width: 100%; height: 100%;">';
+            $html .= '    <img src="' . $thumbUrl . '&v=' . time() . '" class="open-media-editor-as-gallery" data-json="' . htmlspecialchars($urlsJson, ENT_QUOTES, 'UTF-8') . '" style="cursor: pointer; width: 100%; height: 160px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Reçu">';
+            $html .= '  </div>';
+            $html .= '</div>';
+            
+            print $html;
+        }
     } else {
         print json_encode(['success' => false, 'error' => 'Upload failed']);
     }
@@ -314,38 +319,17 @@ print '</div>';
 // JS to auto-reload when Saturne finishes uploading ONLY for fast capture
 print '<script>
 $(document).ready(function() {
-    let pendingUploads = 0;
-    window.isFastCaptureUploadPending = false;
-    
-    // Detect when user selects a file in the fast capture block using capture phase
-    // This bypasses any e.stopPropagation() that Saturne might use.
-    var fastCaptureBlock = document.getElementById("saturne-fast-capture");
-    if (fastCaptureBlock) {
-        fastCaptureBlock.addEventListener("change", function(e) {
-            if (e.target && e.target.type === "file") {
-                window.isFastCaptureUploadPending = true;
-            }
-        }, true);
-    }
-
-    $(document).ajaxSend(function(event, jqxhr, settings) {
-        if (settings.url && (settings.url.indexOf("action=upload_media") !== -1 || settings.url.indexOf("action=uploadPhoto") !== -1)) {
-            if (window.isFastCaptureUploadPending) {
-                pendingUploads++;
-            }
-        }
-    });
     $(document).ajaxComplete(function(event, xhr, settings) {
         if (settings.url && (settings.url.indexOf("action=upload_media") !== -1 || settings.url.indexOf("action=uploadPhoto") !== -1)) {
-            if (window.isFastCaptureUploadPending) {
-                pendingUploads--;
-                if (pendingUploads <= 0) {
-                    pendingUploads = 0;
-                    window.isFastCaptureUploadPending = false;
+            try {
+                var res = JSON.parse(xhr.responseText);
+                if (res && res.fast_capture) {
                     setTimeout(function() {
                         window.location.reload();
                     }, 500);
                 }
+            } catch(e) {
+                // Not JSON, probably HTML for image edit refresh, ignore.
             }
         }
     });
